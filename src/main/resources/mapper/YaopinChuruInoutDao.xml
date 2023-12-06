@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.YaopinChuruInoutDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.yaopin_churu_inout_uuid_number as yaopinChuruInoutUuidNumber
+        ,a.yaopin_churu_inout_name as yaopinChuruInoutName
+        ,a.yaopin_churu_inout_types as yaopinChuruInoutTypes
+        ,a.yaopin_churu_inout_content as yaopinChuruInoutContent
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.YaopinChuruInoutView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM yaopin_churu_inout  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.yaopinChuruInoutUuidNumber != '' and params.yaopinChuruInoutUuidNumber != null and params.yaopinChuruInoutUuidNumber != 'null' ">
+                and a.yaopin_churu_inout_uuid_number like CONCAT('%',#{params.yaopinChuruInoutUuidNumber},'%')
+            </if>
+            <if test=" params.yaopinChuruInoutName != '' and params.yaopinChuruInoutName != null and params.yaopinChuruInoutName != 'null' ">
+                and a.yaopin_churu_inout_name like CONCAT('%',#{params.yaopinChuruInoutName},'%')
+            </if>
+            <if test="params.yaopinChuruInoutTypes != null and params.yaopinChuruInoutTypes != ''">
+                and a.yaopin_churu_inout_types = #{params.yaopinChuruInoutTypes}
+            </if>
+            <if test=" params.yaopinChuruInoutContent != '' and params.yaopinChuruInoutContent != null and params.yaopinChuruInoutContent != 'null' ">
+                and a.yaopin_churu_inout_content like CONCAT('%',#{params.yaopinChuruInoutContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
